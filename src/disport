@@ -2,11 +2,7 @@
 set -e
 
 make() {
-    export PORTVERSION=$(disport_base_version)$(disport_patch_level)
-    export PKGNAMESUFFIX=$(disport_pkg_suffix)
-    export GH_TAGNAME=$CIRRUS_CHANGE_IN_REPO
-
-    /usr/bin/make disport
+    /usr/bin/make PORTVERSION=$(disport_base_version)$(disport_patch_level) PKGNAMESUFFIX=$(disport_pkg_suffix) GH_TAGNAME=$CIRRUS_CHANGE_IN_REPO disport
     tar -czf _disport.txz _disport
     curl -s -X POST --data-binary @_disport.txz http://${CIRRUS_HTTP_CACHE_HOST}/_disport-${CIRRUS_BUILD_ID}.txz
 }
