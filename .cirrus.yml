@@ -38,7 +38,7 @@ build_task:
     path: /usr/local/etc/ssl/certs/patmaddox.cert
     variable_name: CERT
   bootstrap_script: cd disport && make install
-  disport_script: make disport_cirrus_upload
+  make_script: disport make
 package_task:
   execution_lock: poudriere # ensures only one poudriere task runs at a time
   depends_on:
@@ -59,7 +59,7 @@ package_task:
     path: /usr/local/etc/ssl/certs/patmaddox.cert
     variable_name: CERT
   bootstrap_script: cd disport && make install
-  poudriere_script: make disport_poudriere
+  package_script: disport package
   always:
     makefile_artifacts:
       path: _disport/*
