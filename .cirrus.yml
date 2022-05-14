@@ -37,7 +37,7 @@ build_task:
   cert_file:
     path: /usr/local/etc/ssl/certs/patmaddox.cert
     variable_name: CERT
-  bootstrap_script: cd disport && make install
+  bootstrap_script: cd disport && export GH_TAGNAME=$CIRRUS_BRANCH make install
   make_script: disport make
 package_task:
   execution_lock: poudriere # ensures only one poudriere task runs at a time
@@ -58,7 +58,7 @@ package_task:
   cert_file:
     path: /usr/local/etc/ssl/certs/patmaddox.cert
     variable_name: CERT
-  bootstrap_script: cd disport && make install
+  bootstrap_script: cd disport && export GH_TAGNAME=$CIRRUS_BRANCH make install
   package_script: disport package
   always:
     makefile_artifacts:
