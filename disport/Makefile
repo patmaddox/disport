@@ -11,7 +11,7 @@ NO_BUILD= yes
 USE_GITHUB= yes
 GH_ACCOUNT= patmaddox
 GH_PROJECT= disport
-GH_TAGNAME= 966a6ce5bb41dcc16ea76426ea49f74ae091cdc2
+GH_TAGNAME= 266815a27328e8ea1efa2229d2c9c4773561bf9c
 
 do-install:
 	mkdir -p $(STAGEDIR)$(PREFIX)/libexec/disport/
