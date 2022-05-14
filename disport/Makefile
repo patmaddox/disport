@@ -14,7 +14,7 @@ GH_PROJECT= disport
 GH_TAGNAME= c27fa4523f0762dabafea73cecdd964d3b193143
 
 do-install:
-	$(INSTALL_SCRIPT) $(WRKSRC)/src/disport.sh $(STAGEDIR)$(PREFIX)/bin/
+	$(INSTALL_SCRIPT) $(WRKSRC)/src/disport $(STAGEDIR)$(PREFIX)/bin/
 	cd $(STAGEDIR)$(PREFIX) && find * -type f -or -type l >> $(TMPPLIST)
 
 .include <bsd.port.mk>
