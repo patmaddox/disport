@@ -2,6 +2,7 @@ freebsd_instance:
   image_family: freebsd-13-0
 
 env:
+  GH_TAGNAME: $CIRRUS_CHANGE_IN_REPO
   CERT: |
     -----BEGIN PUBLIC KEY-----
     MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAt8yshSIxyFbuMB4uf7sf
@@ -37,7 +38,7 @@ build_task:
   cert_file:
     path: /usr/local/etc/ssl/certs/patmaddox.cert
     variable_name: CERT
-  bootstrap_script: cd disport && export GH_TAGNAME=$CIRRUS_CHANGE_IN_REPO make install
+  bootstrap_script: cd disport && make install
   make_script: disport make
 package_task:
   execution_lock: poudriere # ensures only one poudriere task runs at a time
@@ -58,7 +59,7 @@ package_task:
   cert_file:
     path: /usr/local/etc/ssl/certs/patmaddox.cert
     variable_name: CERT
-  bootstrap_script: cd disport && export GH_TAGNAME=$CIRRUS_CHANGE_IN_REPO make install
+  bootstrap_script: cd disport && make install
   package_script: disport package
   always:
     makefile_artifacts:
