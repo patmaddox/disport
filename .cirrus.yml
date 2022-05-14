@@ -1,7 +1,42 @@
 freebsd_instance:
   image_family: freebsd-13-0
 
+env:
+  CERT: |
+    -----BEGIN PUBLIC KEY-----
+    MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAt8yshSIxyFbuMB4uf7sf
+    XVNeudGIle7/G3UltIhQwYcJNklNeVSQrugWFtt2CgM20kasa3Wo+QuIAKFHTEsn
+    K9WaUIXWuWo/t+VW9jo3FwSyhvuflmE2r4tnCv16Rh4Ci8dx9AQ5JC8aPQXulG5d
+    E4ZS1P5ToyuDVxkWeXd6lblP/k57JOHJE369x01FTcgCX5v4pqGMzhlrHunfbX+R
+    /mwRQZXF+cYdyXJ6BkX6J6bRnZJ9NnDQRHH14i7xyQfFz9G7nafDJBH7mXmxS/jl
+    ImkQiY5ZzNekZNf5TQ2hg6nhs9AdkSrZJQFjKGSBG7spKGFhYK2BxGUXhMLIiHvZ
+    LmImudepouFtzqrLPG4GP9NUxuChm9LcNak/c3EFru4hB8JtpilxKpVT8hWANcsS
+    E4Syv1HgS2dzvfChLrZ0XanBVWgYQ5agTqcCqP1HfNi/kkjYAfQ6TlXtGPlxkGlc
+    kIQrEGhlaZQNIWk1ozRjG4Icgg6aGob0noEsC5MGYNNy/7QjALwtwKpkFWqX81A7
+    a/n7HeNcW/xXOYU2ztphomLK6xJqX+c6LyeWE67qWhvzUYleIm60QVHYeIj/OVdD
+    LihKIad/RtXYqlm43mdRQpQnlFKtDMlwKONCX/Onjp6cwMUmbU6bw7i9OkOWT67U
+    eap8Z9bExpz3tDd47wvIpWUCAwEAAQ==
+    -----END PUBLIC KEY-----
+  REPO: |
+    patmaddox: {
+      url: "http://pkg.patmaddox.com",
+      mirror_type: "http",
+      signature_type: "pubkey",
+      pubkey: "/usr/local/etc/ssl/certs/patmaddox.cert",
+      enabled: yes
+    }
+
 build_task:
+  configure_repo_script:
+    - mkdir -p /usr/local/etc/pkg/repos/
+    - |
+      echo "FreeBSD: { enabled: no }" > /usr/local/etc/pkg/repos/FreeBSD.conf
+  repo_conf_file:
+    path: /usr/local/etc/pkg/repos/patmaddox.conf
+    variable_name: REPO
+  cert_file:
+    path: /usr/local/etc/ssl/certs/patmaddox.cert
+    variable_name: CERT
   bootstrap_script: cd disport && make install
   disport_script: make disport_cirrus_upload
 package_task:
@@ -13,6 +48,16 @@ package_task:
     TS_KEY: ENCRYPTED[!631bb588c48fadb93b01ebdbd37e8b9554bc404fcff4e3890ea36adcfeab7c71d2a6262370f0b4440e4bf86d572a1144!]
     SSH_KEY: ENCRYPTED[!667b12fe849f8c965dad439e00ad648c030a5ec33f7d532360258f3c47697ffa5209e8ba5adabbf4c504bf95fd9aad99!]
     PKG_HOST: "pkg.lion-dominant.ts.net ecdsa-sha2-nistp256 AAAAE2VjZHNhLXNoYTItbmlzdHAyNTYAAAAIbmlzdHAyNTYAAABBBNoNL9LT2w6JFKUoN2xFrOUUJeXzL2pBW1M/HvscsAts3eMyUJmtH3dBDUHZ6XH5Gzjqt14/fI0rqCIBTfQPTio="
+  configure_repo_script:
+    - mkdir -p /usr/local/etc/pkg/repos/
+    - |
+      echo "FreeBSD: { enabled: no }" > /usr/local/etc/pkg/repos/FreeBSD.conf
+  repo_conf_file:
+    path: /usr/local/etc/pkg/repos/patmaddox.conf
+    variable_name: REPO
+  cert_file:
+    path: /usr/local/etc/ssl/certs/patmaddox.cert
+    variable_name: CERT
   bootstrap_script: cd disport && make install
   poudriere_script: make disport_poudriere
   always:
