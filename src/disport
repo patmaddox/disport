@@ -30,9 +30,9 @@ pkg() {
     chmod 600 /.cirrus_ssh/*
     fetch -o _disport.txz http://${CIRRUS_HTTP_CACHE_HOST}/_disport-${CIRRUS_BUILD_ID}.txz
     tar -xzf _disport.txz
-    ssh -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts cirrus@pkg "mkdir -p ports/${DISPORT_NAME}"
-    scp -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts _disport/* cirrus@pkg:ports/${DISPORT_NAME}
-    ssh -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts cirrus@pkg "sudo poudriere bulk -j 131RC6 -p default -O cirrus ${DISPORT_NAME}"
+    ssh -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts cirrus@pkg "mkdir -p ports/$(disport_full_name)"
+    scp -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts _disport/* cirrus@pkg:ports/$(disport_full_name)
+    ssh -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts cirrus@pkg "sudo poudriere bulk -j 131RC6 -p default -O cirrus $(disport_full_name)"
 }
 
 disport_patch_level() {
@@ -62,12 +62,12 @@ disport_is_release() {
     fi
 }
 
-disport_flat_dir() {
-    echo $DISPORT_NAME | sed 's:/:_:'
-}
-
 disport_short_name() {
     echo $DISPORT_NAME | sed 's:.*\/::'
+}
+
+disport_full_name() {
+    echo "${DISPORT_NAME}$(disport_pkg_suffix)"
 }
 
 "$@"
