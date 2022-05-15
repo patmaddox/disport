@@ -12,7 +12,7 @@ make() {
 /CATEGORIES/ a\
 CONFLICTS_INSTALL=
 ' \
-	| sed "s:^CONFLICTS_INSTALL=.*:CONFLICTS_INSTALL= $(disport_short_name)*:" \
+	| sed "s:^CONFLICTS_INSTALL=.*:CONFLICTS_INSTALL= $(disport_short_name) $(disport_short_name)-ci-*:" \
 		  > _disport/Makefile
 
     tar -czf _disport.txz _disport
@@ -45,7 +45,7 @@ disport_patch_level() {
 disport_pkg_suffix() {
     if [ $(disport_is_release) = "no" ]
     then
-	echo "-${CIRRUS_BRANCH}"
+	echo "-ci-${CIRRUS_BRANCH}"
     fi    
 }
 
