@@ -4,10 +4,16 @@ set -e
 make() {
     /usr/bin/make disport
 
-    echo "PORTVERSION=$(disport_base_version)$(disport_patch_level)" >> _disport/options
-    echo "PKGNAMESUFFIX=$(disport_pkg_suffix)" >> _disport/options
-    echo "GH_TAGNAME=$CIRRUS_CHANGE_IN_REPO" >> _disport/options
-    echo "CONFLICTS_INSTALL=$(disport_short_name)*" >> _disport/options
+    cat _disport/Makefile \
+	| sed "s:^PORTNAME=.*:PORTNAME= $(disport_short_name)$(disport_pkg_suffix):" \
+	| sed "s:^PORTVERSION=.*:PORTVERSION= $(disport_base_version)$(disport_patch_level):" \
+	| sed "s:^GH_TAGNAME=.*:GH_TAGNAME= ${CIRRUS_CHANGE_IN_REPO}:" \
+	| sed '
+/CATEGORIES/ a\
+CONFLICTS_INSTALL=
+' \
+	| sed "s:^CONFLICTS_INSTALL=.*:CONFLICTS_INSTALL= $(disport_short_name)*:" \
+		  > _disport/Makefile
 
     tar -czf _disport.txz _disport
     curl -s -X POST --data-binary @_disport.txz http://${CIRRUS_HTTP_CACHE_HOST}/_disport-${CIRRUS_BUILD_ID}.txz
@@ -26,8 +32,6 @@ pkg() {
     tar -xzf _disport.txz
     ssh -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts cirrus@pkg "mkdir -p ports/${DISPORT_NAME}"
     scp -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts _disport/* cirrus@pkg:ports/${DISPORT_NAME}
-    ssh -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts cirrus@pkg "sudo mkdir -p /usr/local/etc/poudriere.d/options/$(disport_flat_dir)"
-    ssh -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts cirrus@pkg "sudo cp /home/cirrus/ports/${DISPORT_NAME}/options /usr/local/etc/poudriere.d/options/$(disport_flat_dir)/"
     ssh -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts cirrus@pkg "sudo poudriere bulk -j 131RC6 -p default -O cirrus ${DISPORT_NAME}"
 }
 
