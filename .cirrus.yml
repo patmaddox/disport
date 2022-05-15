@@ -59,7 +59,7 @@ package_task:
     path: /usr/local/etc/ssl/certs/patmaddox.cert
     variable_name: CERT
   bootstrap_script: cd disport && make GH_TAGNAME=$CIRRUS_CHANGE_IN_REPO install
-  package_script: disport package
+  package_script: disport pkg
   always:
     makefile_artifacts:
       path: _disport/*
