@@ -26,7 +26,7 @@ pkg() {
     ssh -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts cirrus@pkg "mkdir -p ports/${DISPORT_NAME}"
     scp -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts _disport/* cirrus@pkg:ports/${DISPORT_NAME}
     ssh -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts cirrus@pkg "sudo mkdir -p /usr/local/etc/poudriere.d/options/$(disport_flat_dir)"
-    ssh -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts cirrus@pkg "sudo cp ports/${DISPORT_NAME}/options /usr/local/etc/poudriere.d/options/$(disport_flat_dir)/"
+    ssh -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts cirrus@pkg "sudo cp /home/cirrus/ports/${DISPORT_NAME}/options /usr/local/etc/poudriere.d/options/$(disport_flat_dir)/"
     ssh -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts cirrus@pkg "sudo poudriere bulk -j 131RC6 -p default -O cirrus ${DISPORT_NAME}"
 }
 
