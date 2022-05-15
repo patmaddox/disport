@@ -7,6 +7,7 @@ make() {
     echo "PORTVERSION=$(disport_base_version)$(disport_patch_level)" >> _disport/options
     echo "PKGNAMESUFFIX=$(disport_pkg_suffix)" >> _disport/options
     echo "GH_TAGNAME=$CIRRUS_CHANGE_IN_REPO" >> _disport/options
+    echo "CONFLICTS_INSTALL=${PORTNAME}*"
 
     tar -czf _disport.txz _disport
     curl -s -X POST --data-binary @_disport.txz http://${CIRRUS_HTTP_CACHE_HOST}/_disport-${CIRRUS_BUILD_ID}.txz
