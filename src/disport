@@ -1,19 +1,18 @@
 #!/bin/sh
 set -e
 
+hello() {
+    echo "You say goodbye, I say hello"
+}
+
 make() {
     /usr/bin/make disport
 
-    cat _disport/Makefile \
-	| sed "s:^PORTNAME=.*:PORTNAME= $(disport_short_name)$(disport_pkg_suffix):" \
-	| sed "s:^PORTVERSION=.*:PORTVERSION= $(disport_base_version)$(disport_patch_level):" \
-	| sed "s:^GH_TAGNAME=.*:GH_TAGNAME= ${CIRRUS_CHANGE_IN_REPO}:" \
-	| sed '
-/CATEGORIES/ a\
-CONFLICTS_INSTALL=
-' \
-	| sed "s:^CONFLICTS_INSTALL=.*:CONFLICTS_INSTALL= $(disport_short_name) $(disport_short_name)-ci-*:" \
-		  > _disport/Makefile
+    cat _disport/Makefile | sed "s:^PORTNAME=.*:PORTNAME= $(disport_short_name)$(disport_pkg_suffix):" > _disport/Makefile
+
+    echo "PORTVERSION= $(disport_base_version)$(disport_patch_level)" >> _disport/options
+    echo "GH_TAGNAME= $CIRRUS_CHANGE_IN_REPO" >> _disport/options
+    echo "CONFLICTS_INSTALL+= $(disport_short_name) $(disport_short_name)-ci-*" >> _disport/options
 
     tar -czf _disport.txz _disport
     curl -s -X POST --data-binary @_disport.txz http://${CIRRUS_HTTP_CACHE_HOST}/_disport-${CIRRUS_BUILD_ID}.txz
@@ -32,6 +31,8 @@ pkg() {
     tar -xzf _disport.txz
     ssh -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts cirrus@pkg "rm -rf ports/$(disport_full_name) && mkdir -p ports/$(disport_full_name)"
     scp -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts _disport/* cirrus@pkg:ports/$(disport_full_name)
+    ssh -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts cirrus@pkg "sudo mkdir -p /usr/local/etc/poudriere.d/options/$(disport_flat_dir)"
+    ssh -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts cirrus@pkg "sudo ln -s -f /home/cirrus/ports/$(disport_full_name)/options /usr/local/etc/poudriere.d/options/$(disport_flat_dir)/options"
     ssh -i /.cirrus_ssh/key -o UserKnownHostsFile=/.cirrus_ssh/known_hosts cirrus@pkg "sudo poudriere bulk -j 131RC6 -p default -O cirrus $(disport_full_name)"
 }
 
@@ -68,6 +69,10 @@ disport_short_name() {
 
 disport_full_name() {
     echo "${DISPORT_NAME}$(disport_pkg_suffix)"
+}
+
+disport_flat_dir() {
+    disport_full_name | sed 's:/:_:'
 }
 
 "$@"
